@@ -664,29 +664,37 @@ if page == "🏠 Home":
           <div style="color:var(--txt2);font-size:.75rem;margin-top:4px;">Total XP: {xp} · {get_level_title(level)}</div>
         </div>""")
 
-        # Quests
-        H("""<div class="card">
-          <div style="font-family:var(--fd);font-size:1.1rem;color:var(--accent);margin-bottom:12px;">📜 Today's Quests</div>""")
+        # Quests Block (Fixed layout and broken structural div strings here)
+        quests_html = f"""<div class="card">
+          <div style="font-family:var(--fd);font-size:1.1rem;color:var(--accent);margin-bottom:12px;">📜 Today's Quests</div>"""
+        
         for i, q in enumerate(p.get("daily_quests",[])):
             done = q.get("done", False)
             icon = "✅" if done else "◻️"
             alpha = ".5" if done else "1"
-            H(f"""<div class="qitem" style="opacity:{alpha};display:flex;align-items:center;gap:12px;">
+            quests_html += f"""
+            <div class="qitem" style="opacity:{alpha};display:flex;align-items:center;gap:12px;margin-bottom:8px;">
               <span style="font-size:1.2rem;">{icon}</span>
               <div style="flex:1;">
-                <div style="color:var(--txt);font-size:.9rem;">{"~~" if done else ""}{q["text"]}{"~~" if done else ""}</div>
+                <div style="color:var(--txt);font-size:.9rem;">{q["text"]}</div>
                 <div style="color:var(--accent);font-size:.75rem;">+{q["xp"]} XP</div>
               </div>
-            </div>""")
-            if not done and q.get("type") == "wellness":
-                if st.button(f"✔ Done: {q['text'][:28]}", key=f"wq_{i}"):
+            </div>"""
+        
+        quests_html += "</div>"
+        H(quests_html)
+
+        # Action Buttons for Quest Completions rendered cleanly below
+        for i, q in enumerate(p.get("daily_quests",[])):
+            if not q.get("done") and q.get("type") == "wellness":
+                if st.button(f"✔ Mark Done: {q['text']}", key=f"wq_{i}", use_container_width=True):
                     p["daily_quests"][i]["done"] = True
                     p, lv, nl = add_xp(p, q["xp"])
                     save_player(p); st.session_state.player = p
                     if lv: st.session_state.show_level_up=True; st.session_state.new_level=nl
                     st.rerun()
-        H("</div>")
 
+        st.write("") # subtle padding spacer
         if st.button("⚡ Start Studying Now!", use_container_width=True):
             st.session_state.page = "⏱️ Timer"; st.rerun()
 
@@ -877,7 +885,7 @@ elif page == "🗺️ Quests":
               {"<div style='color:var(--accent);font-size:.8rem;margin-top:8px;'>✨ Quest Complete!</div>" if done else ""}
             </div>""")
             if not done and q.get("type") == "wellness":
-                if st.button(f"✔ Mark Done", key=f"qq_{i}"):
+                if st.button(f"✔ Mark Done", key=f"qq_{i}", use_container_width=True):
                     p["daily_quests"][i]["done"] = True
                     p, lv, nl = add_xp(p, q["xp"])
                     save_player(p); st.session_state.player = p
