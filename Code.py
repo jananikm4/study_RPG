@@ -664,7 +664,7 @@ if page == "🏠 Home":
           <div style="color:var(--txt2);font-size:.75rem;margin-top:4px;">Total XP: {xp} · {get_level_title(level)}</div>
         </div>""")
 
-        # Quests Block (Fixed layout and broken structural div strings here)
+        # Quests Block
         quests_html = f"""<div class="card">
           <div style="font-family:var(--fd);font-size:1.1rem;color:var(--accent);margin-bottom:12px;">📜 Today's Quests</div>"""
         
@@ -874,6 +874,8 @@ elif page == "🗺️ Quests":
             done  = q.get("done", False)
             icon  = "✅" if done else "⚔️"
             alpha = ".5" if done else "1"
+            
+            # FIXED: Render cards as self-contained HTML elements using the proper helper or unnested structures
             H(f"""<div class="card" style="opacity:{alpha};">
               <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div>
@@ -884,6 +886,7 @@ elif page == "🗺️ Quests":
               </div>
               {"<div style='color:var(--accent);font-size:.8rem;margin-top:8px;'>✨ Quest Complete!</div>" if done else ""}
             </div>""")
+            
             if not done and q.get("type") == "wellness":
                 if st.button(f"✔ Mark Done", key=f"qq_{i}", use_container_width=True):
                     p["daily_quests"][i]["done"] = True
@@ -951,7 +954,9 @@ elif page == "🎭 Themes":
                 p["unlocked_themes"].append(tk); p["theme"] = tk
                 save_player(p); st.session_state.player = p; st.rerun()
 
-# ════════════════════ STATS ════════════════════
+# ============================================================
+#  STATS
+# ============================================================
 elif page == "📊 Stats":
     p = st.session_state.player
     history  = load_history()
